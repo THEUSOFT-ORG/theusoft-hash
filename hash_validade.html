@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Validador de Documentos — Ṫ͏͏HEÜSOFT</title>
+
+<!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://schema.theusoft.shop/assets/icones/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="https://schema.theusoft.shop/assets/icones/favicon.svg" />
+  <link rel="shortcut icon" href="https://schema.theusoft.shop/assets/icones/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://schema.theusoft.shop/assets/icones/apple-touch-icon.png" />
+  <link rel="manifest" href="https://schema.theusoft.shop/assets/icones/site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="ṪHEÜSOFT" />
+
+<!-- FontAwesome (local) -->
+<link rel="stylesheet" href="css/fontawesome/css/all.min.css">
+
+<style>
+/* ============================
+   THEÜSOFT — Validador (single file)
+   Centralizado / Premium / Mobile-app-like
+   ============================ */
+
+:root{
+  --bg:#060607;
+  --panel:#0f1113;
+  --muted:#97a0aa;
+  --glass: rgba(255,255,255,0.03);
+  --accent1:#ff66c4;
+  --accent2:#7d5bff;
+  --accent3:#5ac8ff;
+  --success:#66e07b;
+  --danger:#ff6b6b;
+  --radius:14px;
+  --maxw:1100px;
+  --card-w:760px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Inter, "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background: linear-gradient(180deg,#060607,#040405);
+  color:#eaf0f7;
+  display:flex;
+  justify-content:center; /* center horizontally */
+  align-items:flex-start;
+  padding:28px 12px;
+}
+
+/* CENTRAL WRAPPER */
+.wrap{
+  width:100%;
+  max-width:var(--maxw);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+}
+
+/* HEADER (centered) */
+.header{
+  width:100%;
+  max-width:var(--card-w);
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.header img{height:56px;width:auto;object-fit:contain}
+.header .title{font-weight:800;font-size:20px}
+.header .sub{font-size:13px;color:var(--muted)}
+
+/* LAYOUT: two columns on desktop, stack on mobile */
+.layout {
+  width:100%;
+  max-width:var(--maxw);
+  display:flex;
+  gap:18px;
+  justify-content:center; /* center whole layout */
+  align-items:flex-start;
+}
+
+/* Left (main) and Right (sidebar) columns, both centered internally */
+.col-left{
+  flex:1 1 640px;
+  max-width:calc(var(--card-w) - 0px);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  align-items:center;
+}
+.col-right{
+  width:min(420px,36%);
+  max-width:420px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  align-items:center;
+}
+
+/* Ensure child cards are centered and full width */
+.col-left .card, .col-right .card {
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+}
+
+/* Card visual */
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  padding:18px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* titles */
+.mini-title{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:10px}
+.h2{font-size:18px;margin:0 0 10px 0;font-weight:700}
+
+/* Controls centered */
+.controls{
+  width:100%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.input{
+  flex:1 1 320px;
+  min-width:180px;
+  padding:12px 14px;border-radius:10px;border:none;background:#0b0c0e;color:#eaf0f7;font-size:14px;outline:none;
+}
+.btn{
+  padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041017;font-weight:700;
+}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+.btn.small{padding:8px 10px;font-size:13px}
+
+/* drop zone centered and responsive */
+.drop{
+  width:100%;
+  max-width:var(--card-w);
+  padding:34px 18px;border-radius:12px;border:1px dashed rgba(255,255,255,0.04);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(180deg, rgba(255,255,255,0.006), transparent);
+  cursor:pointer; transition:all .16s ease;
+}
+.drop.dragover{transform:translateY(-3px);border-color:rgba(125,91,255,0.7);box-shadow:0 18px 40px rgba(125,91,255,0.05)}
+.drop i{font-size:44px;background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.drop p{margin:0;color:var(--muted);font-size:14px;text-align:center}
+
+/* Result area */
+.result-grid{width:100%;max-width:var(--card-w);margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.hash-row{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+.hash-text{font-family:ui-monospace,monospace;font-size:13px;color:#e6eef8;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:calc(100% - 96px)}
+.hash-actions{display:flex;gap:8px;align-items:center}
+
+/* meta list (mapped fields) - center everything */
+.meta-list{width:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.meta-item{width:100%;display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+.meta-item .icon{width:48px;height:48px;border-radius:10px;background:linear-gradient(90deg,var(--accent2),var(--accent3));display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.meta-item .key{font-size:12px;color:var(--muted);margin-bottom:6px}
+.meta-item .val{font-family:ui-monospace,monospace;font-size:13px;color:#e6eef8;word-break:break-word}
+
+/* center compare area */
+.compare-row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-weight:700}
+.badge.ok{color:var(--success);border:1px solid rgba(102,224,123,0.08)}
+.badge.no{color:var(--danger);border:1px solid rgba(255,107,107,0.06)}
+.compare-text{color:var(--muted);font-size:13px;text-align:center;max-width:760px}
+
+/* validators icons centered */
+.validators{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.validator{width:46px;height:46px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none}
+.validator i{font-size:20px;color:var(--grad1)}
+
+/* log card */
+.log-card{width:100%;max-width:var(--card-w);margin:0 auto}
+
+/* footer centered and visible */
+footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;padding:12px;text-align:center;color:var(--muted);border-top:1px solid rgba(255,255,255,0.02);font-size:13px}
+.footer-brand{font-weight:700;color:#fff}
+
+/* toast */
+.toast{position:fixed;right:20px;bottom:20px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041018;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,0.5)}
+
+/* hidden helper */
+.hidden{display:none !important;}
+
+/* responsive: mobile app-like */
+@media (max-width:980px){
+  .layout{flex-direction:column;align-items:center}
+  .col-right{width:100%;max-width:var(--card-w)}
+  .col-left{max-width:var(--card-w)}
+  .hash-text{max-width:100%}
+}
+@media (max-width:640px){
+  .header img{height:48px}
+  .meta-item{flex-direction:column;align-items:center;text-align:center}
+  .hash-row{flex-direction:column;align-items:flex-start}
+  .btn{width:100%}
+  .controls{flex-direction:column;align-items:stretch}
+  .drop{padding:20px}
+}
+
+/* ===== TOPBAR GERAL ===== */
+.ts-topbar{
+  width:100%;
+  background:#0b0b0d;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:12px 0;
+  position:fixed;
+  top:0; left:0;
+  z-index:99999;
+  backdrop-filter:blur(8px);
+}
+
+.ts-topbar-inner{
+  width:100%;
+  max-width:1400px;
+  margin:auto;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+/* ===== LOGO ===== */
+.ts-topbar-logo img{
+  height:52px;
+  transition:.25s;
+}
+
+/* ===== CONTATOS ===== */
+.ts-topbar-contacts{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  color:#cfd4db;
+  font-size:13px;
+  font-weight:500;
+}
+.ts-topbar-contacts i{
+  color:var(--accent2);
+}
+
+/* ===== NAVEGAÇÃO ===== */
+.ts-topbar-nav{
+  display:flex;
+  gap:28px;
+}
+.ts-topbar-nav a{
+  color:#e8ecf5;
+  font-weight:600;
+  text-decoration:none;
+  position:relative;
+}
+.ts-topbar-nav a:after{
+  content:"";
+  position:absolute;
+  bottom:-4px; left:0;
+  width:0%; height:2px;
+  background:linear-gradient(90deg,#ff66c4,#7d5bff);
+  transition:.25s;
+}
+.ts-topbar-nav a:hover:after{width:100%;}
+
+/* ===== REDES SOCIAIS ===== */
+.ts-topbar-socials{
+  display:flex;
+  gap:16px;
+}
+.ts-topbar-socials a{
+  color:#fff; font-size:18px;
+  opacity:.8; transition:.25s;
+}
+.ts-topbar-socials a:hover{
+  opacity:1;
+  transform:scale(1.15);
+}
+
+/* ===== BOTÃO MOBILE ===== */
+.ts-menu-btn{
+  display:none;
+  border:none;
+  background:none;
+  color:#fff;
+  font-size:28px;
+}
+
+/* ===== ESPAÇAMENTO PARA NÃO COBRIR O CONTEÚDO ===== */
+.ts-topbar-spacer{
+  height:82px;
+}
+
+/* ===== RESPONSIVO ===== */
+@media(max-width:1150px){
+  .ts-topbar-contacts,
+  .ts-topbar-nav,
+  .ts-topbar-socials{
+    display:none;
+  }
+  .ts-menu-btn{
+    display:block;
+  }
+}
+
+/* ===== MOBILE MENU ===== */
+.ts-mobile{
+  position:fixed; top:0; left:0;
+  width:100%; height:100vh;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(4px);
+  display:flex;
+  justify-content:flex-end;
+}
+
+.ts-mobile-content{
+  width:80%;
+  max-width:340px;
+  background:#0c0c10;
+  height:100%;
+  padding:28px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  border-left:1px solid rgba(255,255,255,0.07);
+}
+
+.ts-mobile-close{
+  border:none;
+  background:none;
+  color:#fff;
+  font-size:28px;
+  align-self:flex-end;
+}
+
+.ts-mobile a{
+  text-decoration:none;
+  font-size:20px;
+  color:#fff;
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.ts-mobile-social{
+  margin-top:auto;
+  display:flex;
+  gap:20px;
+}
+
+.hidden{display:none!important;}
+
+
+/* ===== ANIMAÇÃO DE PULSO ===== */
+@keyframes tsPulse {
+  0%   { transform: scale(1);     filter: drop-shadow(0 0 0px rgba(255,255,255,0.15)); }
+  50%  { transform: scale(1.04);  filter: drop-shadow(0 0 6px rgba(255,255,255,0.28)); }
+  100% { transform: scale(1);     filter: drop-shadow(0 0 0px rgba(255,255,255,0.15)); }
+}
+
+/* Aplicar animação à logo */
+.ts-topbar-logo img{
+  animation: tsPulse 3.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+
+/* FOOTER FIXO */
+.ts-footer{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#0c0c11;
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding:8px 0;
+  z-index:9999;
+  backdrop-filter:blur(8px);
+  animation: tsFooterFade .8s ease forwards;
+}
+
+@keyframes tsFooterFade{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* CONTAINER INTERNO */
+.ts-footer-inner{
+  max-width:1400px;
+  margin:auto;
+  padding:0 20px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:26px;
+}
+
+/* LOGO */
+.ts-footer-logo img{
+  height:42px;
+  opacity:.93;
+  animation: tsFooterPulse 4.4s ease-in-out infinite;
+}
+
+@keyframes tsFooterPulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.03);}
+  100%{transform:scale(1);}
+}
+
+/* SLOGAN */
+.ts-footer-slogan{
+  font-size:12px;
+  color:#fff;
+  opacity:.88;
+  letter-spacing:0.4px;
+  text-align:center;
+}
+
+/* SOCIAL */
+.ts-footer-social{
+  display:flex;
+  gap:14px;
+}
+.ts-footer-social a{
+  color:#fff;
+  font-size:20px;
+  opacity:.8;
+  transition:.25s;
+}
+.ts-footer-social a:hover{
+  opacity:1;
+  transform:scale(1.15);
+}
+
+/* MOBILE */
+@media(max-width:700px){
+  .ts-footer-inner{
+    flex-direction:column;
+    gap:10px;
+  }
+  .ts-footer-slogan{
+    font-size:11px;
+    text-align:center;
+    max-width:90%;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- TOPBAR ÚNICO -->
+<div class="ts-topbar">
+  <div class="ts-topbar-inner">
+
+    <!-- LOGO -->
+    <a href="#" class="ts-topbar-logo">
+      <img src="img/logotipo_branco.png" alt="Ṫ͏͏HEÜSOFT" onerror="this.src='img/logo.png'">
+    </a>
+
+    <!-- NAVEGAÇÃO (desktop) -->
+    <nav class="ts-topbar-nav">
+      <a href="#">Início</a>
+      <a href="#">Validador</a>
+      <a href="#">Documentos</a>
+      <a href="#">Sobre</a>
+      <a href="#">Contato</a>
+    </nav>
+
+
+    <!-- MENU MOBILE -->
+    <button class="ts-menu-btn" onclick="tsMenu()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+  </div>
+</div>
+
+<!-- MENU MOBILE FULLSCREEN -->
+<div id="ts-mobile" class="ts-mobile hidden">
+  <div class="ts-mobile-content">
+
+    <button class="ts-mobile-close" onclick="tsMenu()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <a href="#">Início</a>
+    <a href="#">Validador</a>
+    <a href="#">Documentos</a>
+    <a href="#">Sobre</a>
+    <a href="#">Contato</a>
+
+    <div class="ts-mobile-social">
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-github"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- ESSE SPACER GARANTE QUE A UI NÃO FIQUE POR BAIXO DO TOPBAR -->
+<div class="ts-topbar-spacer"></div>
+
+
+  <!-- Layout columns -->
+  <div class="layout">
+    <div class="col-left">
+
+      <!-- Controls card -->
+      <div class="card" role="region" aria-label="Consulta e upload">
+        <div class="mini-title">Consulta & Upload</div>
+
+        <div class="controls">
+          <input id="externalHashInput" class="input" placeholder="Cole o hash canônico (ou acesse /validate/&lt;hash&gt;)" />
+          <button id="btnQuery" class="btn small"><i class="fa-solid fa-magnifying-glass"></i>&nbsp;Consultar</button>
+          <button id="btnPaste" class="btn small ghost" title="Colar do clipboard"><i class="fa-regular fa-clipboard"></i></button>
+        </div>
+
+        <div id="dropZone" class="drop" aria-label="Arraste o PDF aqui">
+          <i class="fa-solid fa-file-arrow-up"></i>
+          <p id="dropText">Arraste o PDF ou clique para selecionar. A validação é feita localmente (bytes).</p>
+          <input id="fileInput" type="file" accept="application/pdf" style="display:none">
+        </div>
+
+        <div id="feedback" style="margin-top:12px;color:var(--muted);font-size:13px"></div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;">
+          <button id="btnClear" class="btn ghost hidden"><i class="fa-solid fa-broom"></i>&nbsp;Limpar</button>
+        </div>
+      </div>
+
+      <!-- Results card -->
+      <div id="resultGrid" class="result-grid hidden">
+
+        <div class="card">
+          <div class="mini-title">Hashes</div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <div style="font-size:13px;color:var(--muted);margin-bottom:6px">Hash do arquivo (com bloco)</div>
+              <div class="hash-row">
+                <div class="hash-text" id="hashWith">—</div>
+                <div class="hash-actions">
+                  <button id="cpyWith" class="btn small ghost" title="Copiar"><i class="fa-regular fa-copy"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:13px;color:var(--muted);margin-top:6px;margin-bottom:6px">Hash canônico registrado (endpoint)</div>
+              <div class="hash-row">
+                <div class="hash-text" id="hashRegistered">—</div>
+                <div class="hash-actions">
+                  <button id="cpyRegistered" class="btn small ghost" title="Copiar"><i class="fa-regular fa-copy"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:13px;color:var(--muted);margin-top:6px;margin-bottom:6px">Hash canônico (sem bloco — calculado localmente)</div>
+              <div class="hash-row">
+                <div class="hash-text" id="hashWithout">—</div>
+                <div class="hash-actions">
+                  <button id="cpyWithout" class="btn small ghost" title="Copiar"><i class="fa-regular fa-copy"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="compare-row" style="margin-top:8px">
+              <div id="compareBadge" class="badge hidden"></div>
+              <div id="compareText" class="compare-text"></div>
+            </div>
+
+            <div style="margin-top:8px">
+              <div style="font-size:13px;color:var(--muted)">Verificar externamente</div>
+              <div class="validators" id="validators">
+                <a id="v1" class="validator" title="SHA256 Checksum" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i></a>
+                <a id="v2" class="validator" title="SHA256 Online" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i></a>
+                <a id="v3" class="validator" title="Hash Tools" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i></a>
+                <a id="v4" class="validator" title="Calculator" target="_blank" rel="noopener"><i class="fa-solid fa-link"></i></a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="col-right">
+
+      <div id="metaCard" class="card hidden" aria-live="polite">
+        <div class="mini-title">Bloco de Validação — itens</div>
+        <div id="metaList" class="meta-list"></div>
+      </div>
+
+      <div id="logCard" class="card hidden log-card">
+        <div class="mini-title">Atividade</div>
+        <div id="logArea" style="color:var(--muted);font-size:13px;line-height:1.4"></div>
+      </div>
+
+    </div>
+  </div>
+
+<footer class="ts-footer">
+  <div class="ts-footer-inner">
+
+    <!-- LOGO -->
+    <div class="ts-footer-logo">
+      <img src="img/logo_theusoft_branco.png" alt="Ṫ͏͏HEÜSOFT" 
+           onerror="this.src='img/logo.png'">
+    </div>
+
+    <!-- SLOGAN -->
+    <div class="ts-footer-slogan">
+      Ṫ͏͏ECNOLOGIA QÜE APRÖXIMA, EDÜCAÇÃO QÜE TRANSFÖRMA.
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="ts-footer-social">
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-github"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+    </div>
+
+  </div>
+</footer>
+
+
+</div>
+
+<script src="validate.js"></script>
+</body>
+</html>
