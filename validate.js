@@ -4,9 +4,11 @@
 
 /* --- Configurações --- */
 const CONFIG = {
-  API_BASE: 'https://integrity.theusoft.shop',
+  API_BASE: 'https://integrity.theusoft.shop', // API real
+  VALIDATION_BASE: 'https://hash.theusoft.shop', // Front-end de validação
   ENDPOINTS: {
-    VALIDATE: '/read/'
+    STATUS: '/status',
+    READ: '/read/'
   },
   VALIDATORS: [
     'https://emn178.github.io/online-tools/sha256_checksum.html',
@@ -84,42 +86,49 @@ const API = {
       throw new Error('Hash inválido: deve ter 64 caracteres hexadecimais');
     }
 
-    const url = `${CONFIG.API_BASE}${CONFIG.ENDPOINTS.VALIDATE}${hash}`;
-    Logger.info(`Validando hash via API: ${url}`);
+    // CORRETO: https://integrity.theusoft.shop/read/{hash}
+    const url = `${CONFIG.API_BASE}${CONFIG.ENDPOINTS.READ}${hash}`;
+    Logger.info(`Consultando registro: ${url}`);
 
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
-
       const response = await fetch(url, {
         method: 'GET',
-        signal: controller.signal,
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Accept': 'application/json'
         }
       });
 
-      clearTimeout(timeout);
+      Logger.info(`Status da resposta: ${response.status}`);
+
+      if (response.status === 404) {
+        return { 
+          valid: false, 
+          message: 'Hash não encontrado no registro VÆLORÜM',
+          status: 404
+        };
+      }
 
       if (!response.ok) {
-        // Se a API retornar erro, tratamos como hash inválido
-        if (response.status === 404) {
-          return { valid: false, message: 'Hash não encontrado no registro' };
-        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      Logger.info('Resposta da API recebida', data);
+      // Se chegou aqui, o hash existe no registro
+      const data = await response.text(); // Pode ser texto ou JSON
+      Logger.info('Resposta da API recebida', { data: data.substring(0, 200) });
       
-      // Assumindo que a API retorna { valid: true/false } ou similar
-      return data;
+      return { 
+        valid: true,
+        message: 'Hash registrado no núcleo VÆLORÜM',
+        data: data
+      };
 
     } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Timeout: A validação excedeu o tempo limite de 10 segundos');
+      Logger.error('Erro na consulta ao registro', { error: error.message });
+      
+      if (error.message.includes('Failed to fetch') || error.message.includes('CORS')) {
+        throw new Error('Não foi possível acessar o registro VÆLORÜM. Verifique a conexão.');
       }
+      
       throw error;
     }
   }
@@ -545,7 +554,7 @@ async function handleFileUpload(file) {
 /* Validação via API */
 async function validateHash(hash) {
   UIManager.setLoading(true);
-  UIManager.showInfo('Validando hash...');
+  UIManager.showInfo('Consultando registro VÆLORÜM...');
   UIManager.showResults();
   
   try {
@@ -553,52 +562,66 @@ async function validateHash(hash) {
     
     hashRegisteredEl.textContent = hash;
     
-    // Verificar diferentes formatos de resposta da API
-    const isValid = result.valid === true || 
-                   result.status === 'valid' || 
-                   result.status === 'verified' ||
-                   (result.entity && result.entity.includes('VÆLORÜM'));
-    
-    UIManager.updateValidationResult(
-      isValid,
-      isValid ? 
-        '✓ Hash válido e registrado no sistema VÆLORÜM' : 
-        '✗ Hash inválido ou não registrado'
-    );
-    
-    if (isValid) {
+    if (result.valid) {
+      UIManager.updateValidationResult(
+        true,
+        '✓ Hash válido e registrado no sistema VÆLORÜM'
+      );
       UIManager.showSuccess('Validação concluída com sucesso');
-      // Se a API retornar metadados, preencher a lista
-      if (result.metadata || result.details) {
-        UIManager.populateMetaList(result.metadata || result.details);
+      
+      // Tentar extrair metadados se a resposta contiver dados
+      if (result.data && typeof result.data === 'string' && result.data.includes('ENTITY')) {
+        try {
+          const lines = result.data.split('\n');
+          const metadata = {};
+          lines.forEach(line => {
+            if (line.includes(':')) {
+              const [key, value] = line.split(':').map(s => s.trim());
+              if (key && value) metadata[key] = value;
+            }
+          });
+          if (Object.keys(metadata).length > 0) {
+            UIManager.populateMetaList(metadata);
+          }
+        } catch (e) {
+          Logger.warn('Não foi possível extrair metadados da resposta');
+        }
       }
     } else {
-      UIManager.showError('Hash não encontrado no registro');
+      UIManager.updateValidationResult(
+        false,
+        '✗ Hash não encontrado no registro VÆLORÜM'
+      );
+      UIManager.showError('Hash não consta no registro');
     }
     
-    // Validar com arquivo se disponível
+    // Validação local se tiver arquivo carregado
     if (STATE.currentHash) {
       performLocalValidation(hash, STATE.currentHash);
     }
     
   } catch (error) {
-    UIManager.showError('Falha na validação: ' + error.message);
-    Logger.error('Erro na validação', { hash, error: error.message });
+    UIManager.showError('Erro na consulta: ' + error.message);
+    Logger.error('Falha na consulta do hash', { 
+      hash: hash, 
+      error: error.message 
+    });
     
-    // Fallback para validação local
+    // Fallback
     hashRegisteredEl.textContent = hash;
-    const localValid = /^[0-9a-f]{64}$/i.test(hash);
+    const isHashFormatValid = /^[0-9a-f]{64}$/i.test(hash);
     UIManager.updateValidationResult(
-      localValid,
-      localValid ? 
-        '✓ Hash válido (validação local - API indisponível)' : 
-        '✗ Hash inválido (validação local - API indisponível)'
+      isHashFormatValid,
+      isHashFormatValid ? 
+        '✓ Hash com formato válido (registro indisponível)' : 
+        '✗ Hash com formato inválido'
     );
   } finally {
     UIManager.setLoading(false);
     enableClearButton();
   }
 }
+
 /* Validação local entre hashes */
 function performLocalValidation(registeredHash, computedHash) {
   if (registeredHash.toLowerCase() === computedHash.toLowerCase()) {
@@ -661,14 +684,13 @@ function initializeFromURL() {
       Logger.info(`Hash da URL: ${hashFromURL}`);
       
       // Validar automaticamente se veio da URL
-      setTimeout(() => validateHash(hashFromURL), 500);
+      setTimeout(() => validateHash(hashFromURL), 1000);
     }
     
   } catch (error) {
     Logger.error('Erro na inicialização', { error: error.message });
   }
 }
-
 /* Menu Mobile */
 function tsMenu() {
   document.getElementById("ts-mobile").classList.toggle("hidden");
