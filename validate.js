@@ -1,14 +1,14 @@
+
+
 /* =========================
    JS: Validador VÆLORÜM - Integração Completa
    ========================= */
 
 /* --- Configurações --- */
 const CONFIG = {
-  API_BASE: 'https://integrity.theusoft.shop', // API real
-  VALIDATION_BASE: 'https://hash.theusoft.shop', // Front-end de validação
+  API_BASE: 'https://integrity.theusoft.shop',
   ENDPOINTS: {
-    STATUS: '/status',
-    READ: '/read/'
+    VALIDATE: '/read/'
   },
   VALIDATORS: [
     'https://emn178.github.io/online-tools/sha256_checksum.html',
@@ -17,7 +17,6 @@ const CONFIG = {
     'https://md5file.com/calculator'
   ]
 };
-
 /* --- Estado da Aplicação --- */
 const STATE = {
   currentFile: null,
@@ -86,6 +85,7 @@ const API = {
       throw new Error('Hash inválido: deve ter 64 caracteres hexadecimais');
     }
 
+    // CORREÇÃO: Construir URL corretamente
     const url = `${CONFIG.API_BASE}${CONFIG.ENDPOINTS.VALIDATE}${hash}`;
     Logger.info(`Validando hash via API: ${url}`);
 
@@ -104,7 +104,7 @@ const API = {
 
       clearTimeout(timeout);
 
-      // CORREÇÃO: Tratar 404 como "hash não encontrado" em vez de erro
+      // Tratar 404 como "hash não encontrado" em vez de erro
       if (response.status === 404) {
         return { valid: false, message: 'Hash não encontrado no registro' };
       }
@@ -127,6 +127,7 @@ const API = {
     }
   }
 };
+
 /* --- Processador de PDF --- */
 const PDFProcessor = {
   async processPDF(file) {
