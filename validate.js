@@ -16,10 +16,6 @@ const CONFIG = {
   ]
 };
 
-// DEBUG: Verificar se a configuração está correta
-console.log('CONFIG carregado:', CONFIG);
-console.log('ENDPOINTS.VALIDATE:', CONFIG.ENDPOINTS.VALIDATE);
-
 /* --- Estado da Aplicação --- */
 const STATE = {
   currentFile: null,
@@ -708,3 +704,4 @@ document.addEventListener('DOMContentLoaded', () => {
     timestamp: new Date().toISOString()
   });
 });
+
