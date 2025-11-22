@@ -1,14 +1,14 @@
-
-
 /* =========================
    JS: Validador VÆLORÜM - Integração Completa
    ========================= */
 
 /* --- Configurações --- */
 const CONFIG = {
-  API_BASE: 'https://integrity.theusoft.shop',
+  API_BASE: 'https://integrity.theusoft.shop', // API real
+  VALIDATION_BASE: 'https://hash.theusoft.shop', // Front-end de validação
   ENDPOINTS: {
-    VALIDATE: '/read/'
+    STATUS: '/status',
+    READ: '/read/'
   },
   VALIDATORS: [
     'https://emn178.github.io/online-tools/sha256_checksum.html',
@@ -104,11 +104,12 @@ const API = {
 
       clearTimeout(timeout);
 
+      // CORREÇÃO: Tratar 404 como "hash não encontrado" em vez de erro
+      if (response.status === 404) {
+        return { valid: false, message: 'Hash não encontrado no registro' };
+      }
+
       if (!response.ok) {
-        // Se a API retornar erro, tratamos como hash inválido
-        if (response.status === 404) {
-          return { valid: false, message: 'Hash não encontrado no registro' };
-        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
@@ -543,7 +544,6 @@ async function handleFileUpload(file) {
     enableClearButton();
   }
 }
-
 /* Validação via API */
 async function validateHash(hash) {
   UIManager.setLoading(true);
@@ -555,11 +555,8 @@ async function validateHash(hash) {
     
     hashRegisteredEl.textContent = hash;
     
-    // Verificar diferentes formatos de resposta da API
-    const isValid = result.valid === true || 
-                   result.status === 'valid' || 
-                   result.status === 'verified' ||
-                   (result.entity && result.entity.includes('VÆLORÜM'));
+    // CORREÇÃO: Tratar corretamente o resultado da API
+    const isValid = result.valid === true;
     
     UIManager.updateValidationResult(
       isValid,
@@ -575,7 +572,8 @@ async function validateHash(hash) {
         UIManager.populateMetaList(result.metadata || result.details);
       }
     } else {
-      UIManager.showError('Hash não encontrado no registro');
+      // CORREÇÃO: Mostrar mensagem informativa em vez de erro para hash não encontrado
+      UIManager.showInfo(result.message || 'Hash não encontrado no registro');
     }
     
     // Validar com arquivo se disponível
@@ -663,14 +661,13 @@ function initializeFromURL() {
       Logger.info(`Hash da URL: ${hashFromURL}`);
       
       // Validar automaticamente se veio da URL
-      setTimeout(() => validateHash(hashFromURL), 500);
+      setTimeout(() => validateHash(hashFromURL), 1000);
     }
     
   } catch (error) {
     Logger.error('Erro na inicialização', { error: error.message });
   }
 }
-
 /* Menu Mobile */
 function tsMenu() {
   document.getElementById("ts-mobile").classList.toggle("hidden");
