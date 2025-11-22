@@ -418,6 +418,36 @@ function validateTsidPrefix(e) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+// --- NOVA FUNÇÃO: Sincronizar ConsentManager após validação ---
+function syncConsentManagerAfterValidation() {
+    console.log('🔄 [validate.js] Sincronizando ConsentManager após validação...');
+    
+    // Aguardar o ConsentManager estar disponível
+    const waitForConsentManager = () => {
+        if (typeof window.consentManager !== 'undefined' && window.consentManager) {
+            console.log('✅ [validate.js] ConsentManager encontrado, atualizando TS-ID...');
+            
+            // Atualizar TS-ID no ConsentManager
+            window.consentManager.currentTsid = currentTsid;
+            console.log('📦 [validate.js] TS-ID definido no ConsentManager:', currentTsid);
+            
+            // Forçar verificação do status do PDF
+            setTimeout(() => {
+                if (window.consentManager.checkPdfStatusAndUpdateUI) {
+                    console.log('🔄 [validate.js] Forçando verificação do PDF...');
+                    window.consentManager.checkPdfStatusAndUpdateUI();
+                }
+            }, 1000);
+            
+        } else {
+            console.log('⏳ [validate.js] ConsentManager não disponível, tentando novamente...');
+            setTimeout(waitForConsentManager, 500);
+        }
+    };
+    
+    waitForConsentManager();
+}
+
 // --- Submissão Ṫ͏͏S-ID (AGORA COM POST) ---
 async function handleTsidSubmit(ev) {
   ev.preventDefault();
@@ -462,19 +492,15 @@ async function handleTsidSubmit(ev) {
 
     // 🔸 só prossegue se status 200
     if (resp.ok) {
-  currentTsid = tsid;
-  
-  // 🔄 NOVO: Sincronizar com ConsentManager
-  syncConsentManagerAfterValidation();
-  
-  showCpfForm();
-  cardDescription.textContent = 'Informe o CPF do paciente para validar o cartão de identificação';
-  
-  if (cardHeaderTitle) {
-    cardHeaderTitle.textContent = 'Validação do CPF do Paciente';
-  }
-  
-  validationCard.classList.add('tsid-validated');
+      currentTsid = tsid;
+      showCpfForm();
+      cardDescription.textContent = 'Informe o CPF do paciente para validar o cartão de identificação';
+      
+      if (cardHeaderTitle) {
+        cardHeaderTitle.textContent = 'Validação do CPF do Paciente';
+      }
+      
+      validationCard.classList.add('tsid-validated');
 
       const cpfBtn = findSubmitButton(cpfForm);
       if (cpfBtn) {
@@ -774,15 +800,11 @@ createPartnershipDisplay(parsed.parceria), // NOVO: Parceria
 '</div>'
 ].join('');
 
-setInputStatus(cpfInput, 'success', 'Validação concluída com sucesso');
-showSuccessState(patientDataHTML);
-
-// 🔄 NOVO: Sincronizar com ConsentManager
-syncConsentManagerAfterValidation();
-
-log('Validação SUCESSO para', tsidToValidate);
+                setInputStatus(cpfInput, 'success', 'Validação concluída com sucesso');
+                showSuccessState(patientDataHTML);
 				
 				
+                log('Validação SUCESSO para', tsidToValidate);
             } else {
                 // resposta ok, mas sem JSON parseável
                 showMessage('<h3>SUCESSO</h3><pre>' + escapeHtml(txt) + '</pre>', 'success');
@@ -1467,41 +1489,11 @@ function init() {
 }
 
 
-// --- NOVA FUNÇÃO: Sincronizar ConsentManager após validação ---
-function syncConsentManagerAfterValidation() {
-    console.log('🔄 [validate.js] Sincronizando ConsentManager após validação...');
-    
-    // Aguardar o ConsentManager estar disponível
-    const waitForConsentManager = () => {
-        if (typeof window.consentManager !== 'undefined' && window.consentManager) {
-            console.log('✅ [validate.js] ConsentManager encontrado, atualizando TS-ID...');
-            
-            // Atualizar TS-ID no ConsentManager
-            window.consentManager.currentTsid = currentTsid;
-            console.log('📦 [validate.js] TS-ID definido no ConsentManager:', currentTsid);
-            
-            // Forçar verificação do status do PDF
-            setTimeout(() => {
-                if (window.consentManager.checkPdfStatusAndUpdateUI) {
-                    console.log('🔄 [validate.js] Forçando verificação do PDF...');
-                    window.consentManager.checkPdfStatusAndUpdateUI();
-                }
-            }, 1000);
-            
-        } else {
-            console.log('⏳ [validate.js] ConsentManager não disponível, tentando novamente...');
-            setTimeout(waitForConsentManager, 500);
-        }
-    };
-    
-    waitForConsentManager();
-}
-
-// Start initialization when DOM is ready
-if (document.readyState === 'loading') {
+  // Start initialization when DOM is ready
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
-} else {
+  } else {
     init();
-}
+  }
 
 })();
