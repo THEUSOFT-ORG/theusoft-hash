@@ -1,5 +1,3 @@
-
-
 /* =========================
    JS: Validador VÆLORÜM - Integração Completa
    ========================= */
@@ -17,6 +15,11 @@ const CONFIG = {
     'https://md5file.com/calculator'
   ]
 };
+
+// DEBUG: Verificar se a configuração está correta
+console.log('CONFIG carregado:', CONFIG);
+console.log('ENDPOINTS.VALIDATE:', CONFIG.ENDPOINTS.VALIDATE);
+
 /* --- Estado da Aplicação --- */
 const STATE = {
   currentFile: null,
@@ -85,8 +88,12 @@ const API = {
       throw new Error('Hash inválido: deve ter 64 caracteres hexadecimais');
     }
 
-    // CORREÇÃO: Construir URL corretamente
-    const url = `${CONFIG.API_BASE}${CONFIG.ENDPOINTS.VALIDATE}${hash}`;
+    // CORREÇÃO: Verificar e garantir que o endpoint está correto
+    const endpoint = CONFIG.ENDPOINTS?.VALIDATE || '/read/';
+    const url = `${CONFIG.API_BASE}${endpoint}${hash}`;
+    
+    // DEBUG: Log para verificar a URL
+    console.log('URL construída:', url);
     Logger.info(`Validando hash via API: ${url}`);
 
     try {
@@ -127,7 +134,6 @@ const API = {
     }
   }
 };
-
 /* --- Processador de PDF --- */
 const PDFProcessor = {
   async processPDF(file) {
