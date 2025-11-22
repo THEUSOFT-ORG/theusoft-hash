@@ -127,7 +127,6 @@ const API = {
     }
   }
 };
-
 /* --- Processador de PDF --- */
 const PDFProcessor = {
   async processPDF(file) {
@@ -599,6 +598,7 @@ async function validateHash(hash) {
     enableClearButton();
   }
 }
+
 /* Validação local entre hashes */
 function performLocalValidation(registeredHash, computedHash) {
   if (registeredHash.toLowerCase() === computedHash.toLowerCase()) {
