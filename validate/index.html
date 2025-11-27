@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Validando Hash...</title>
+</head>
+<body>
+
+<script>
+  // Captura a URL completa
+  const path = window.location.pathname;
+
+  // Extrai o hash após /validate/
+  const hash = path.replace("/validate/", "");
+
+  if (hash.length === 64 && /^[a-f0-9]+$/i.test(hash)) {
+    alert("Hash recebido: " + hash);
+  } else {
+    alert("Hash inválido");
+  }
+</script>
+
+<h1>Validando...</h1>
+
+</body>
+</html>
