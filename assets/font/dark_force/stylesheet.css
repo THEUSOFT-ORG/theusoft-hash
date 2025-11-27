@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'DARK FORCE';
+    src: url('DARKFORCE-Regular.eot');
+    src: local('DARK FORCE Regular'), local('DARKFORCE-Regular'),
+        url('DARKFORCE-Regular.eot?#iefix') format('embedded-opentype'),
+        url('DARKFORCE-Regular.woff2') format('woff2'),
+        url('DARKFORCE-Regular.woff') format('woff'),
+        url('DARKFORCE-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

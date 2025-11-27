@@ -1,0 +1,96 @@
+:root{
+  --watermark-color: rgba(255,255,255,0.06);
+  --wm-size: 22px;
+  --overlay-bg: rgba(2,6,10,0.95);
+  --modal-bg: linear-gradient(152deg, rgba(16,24,36,0.95), rgba(8,16,28,0.98));
+  --modal-border: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+  --accent-color: rgba(100,150,255,0.8);
+}
+
+/* reset de seleção / arraste */
+* {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* layout simples */
+body, html { 
+  height:100%; 
+  margin:0; 
+  font-family: Inter, "Segoe UI", Roboto, sans-serif; 
+  background:#050506; 
+  color:#eaf0f7; 
+}
+
+.protected-wrapper { 
+  min-height:100vh; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  padding:40px; 
+  box-sizing:border-box; 
+}
+
+.protected-content { 
+  width:100%; 
+  max-width:920px; 
+  text-align:center; 
+  padding:48px; 
+  border-radius:14px; 
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); 
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8); 
+  position:relative; 
+  overflow:hidden; 
+}
+
+/* imagem protegida: camada por cima para bloquear 'Salvar como' */
+.protected-image {
+  width:180px;
+  height:auto;
+  display:inline-block;
+  margin-top:22px;
+  pointer-events: none;
+  user-drag: none;
+}
+
+/* WATERMARK */
+#wm {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: normal;
+}
+
+.wm-line {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--watermark-color);
+  font-size: var(--wm-size);
+  transform: rotate(-22deg);
+  white-space: nowrap;
+  opacity: 1;
+}
+
+/* prevent print styles */
+@media print {
+  body * { visibility: hidden !important; }
+  .theusoft-protect-modal { display:flex !important; visibility: visible !important; }
+}
+
+/* mobile adjustments */
+@media (max-width: 640px) {
+  :root { --wm-size: 14px; }
+  .protected-content { padding: 20px; }
+}

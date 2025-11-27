@@ -3,20 +3,19 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<base href="/" />
-  
 <title>Validador de Documentos — Ṫ͏͏HEÜSOFT</title>
 
 <!-- Favicon -->
-  <link rel="icon" type="image/png" href="https://schema.theusoft.shop/assets/icones/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="https://schema.theusoft.shop/assets/icones/favicon.svg" />
-  <link rel="shortcut icon" href="https://schema.theusoft.shop/assets/icones/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="https://schema.theusoft.shop/assets/icones/apple-touch-icon.png" />
-  <link rel="manifest" href="https://schema.theusoft.shop/assets/icones/site.webmanifest" />
+  <link rel="icon" type="image/png" href="assets/icones/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="assets/icones/favicon.svg" />
+  <link rel="shortcut icon" href="assets/icones/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icones/apple-touch-icon.png" />
+  <link rel="manifest" href="assets/icones/site.webmanifest" />
   <meta name="apple-mobile-web-app-title" content="ṪHEÜSOFT" />
 
 <!-- FontAwesome (local) -->
-<link rel="stylesheet" href="https://schema.theusoft.shop/assets/css/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="assets/css/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="assets/font/cocomat_pro/stylesheet.css">">
 
 <style>
 /* ============================
@@ -35,23 +34,40 @@
   --success:#66e07b;
   --danger:#ff6b6b;
   --radius:14px;
-  --maxw:1100px;
+  --maxw:1200px;
   --card-w:760px;
+  --topbar-height: 82px;   /* conforme sua .ts-topbar-spacer */
+  --footer-height: 52px;   /* altura real da footer fixa */
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0;
-  font-family:Inter, "Segoe UI", Arial, sans-serif;
+	margin:0;
+  font-family: 'Cocomat Pro', "Segoe UI", Tahoma, sans-serif;
   -webkit-font-smoothing:antialiased;
   background: linear-gradient(180deg,#060607,#040405);
   color:#eaf0f7;
   display:flex;
   justify-content:center; /* center horizontally */
   align-items:flex-start;
-  padding:28px 12px;
+  padding:0;
 }
+
+/* ===== CORREÇÃO DO LAYOUT CENTRAL ===== */
+.main-container {
+  width: 100%;
+  min-height: calc(100vh - var(--topbar-height) - var(--footer-height));
+  display: flex;
+  justify-content: center;
+  align-items: center; /* ← Mantém centralizado */
+  overflow-y: auto; /* ← Habilita scroll quando necessário */
+  overflow-x: hidden;
+  position: relative;
+}
+
+
+
 
 /* CENTRAL WRAPPER */
 .wrap{
@@ -82,9 +98,13 @@ body{
   width:100%;
   max-width:var(--maxw);
   display:flex;
-  gap:18px;
+  gap:20px;
   justify-content:center; /* center whole layout */
   align-items:flex-start;
+  
+   /* COR DE TESTE - vermelho semi-transparente para ver os limites */
+  /* background-color: rgba(255, 0, 0, 0.2); */
+    /* border: 2px dashed #ff4444; */
 }
 
 /* Left (main) and Right (sidebar) columns, both centered internally */
@@ -95,7 +115,24 @@ body{
   flex-direction:column;
   gap:14px;
   align-items:center;
+  justify-content: center; /* ← CORREÇÃO: Centralizar verticalmente */
+  min-height: 100%; /* ← CORREÇÃO: Garantir altura mínima */
 }
+/* CORREÇÃO: Apenas no estado inicial (quando não há resultados) */
+.wrap.initial-state .col-left {
+  justify-content: center;
+}
+
+.wrap.has-content .col-left {
+  justify-content: flex-start; /* ← Voltar ao normal quando tem conteúdo */
+}
+
+/* CORREÇÃO: Garantir que o card de controls ocupe espaço adequado */
+.col-left .card:first-child {
+  width: 100%;
+  max-width: var(--card-w);
+}
+
 .col-right{
   width:min(420px,36%);
   max-width:420px;
@@ -103,6 +140,43 @@ body{
   flex-direction:column;
   gap:14px;
   align-items:center;
+}
+
+/* CORREÇÃO: Centralização vertical do card de controles */
+.col-left {
+  flex: 1 1 640px;
+  max-width: calc(var(--card-w) - 0px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  justify-content: center; /* ← Centraliza verticalmente */
+  min-height: 400px; /* ← Altura mínima para garantir espaço */
+  margin-left: 18px;
+  max-height: 100%;
+    overflow: hidden;
+}
+
+.projectIntro {
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+
+/* CORREÇÃO: Apenas no estado inicial (quando não há resultados) */
+.wrap.initial-state .col-left {
+  justify-content: center;
+}
+
+.wrap.has-content .col-left {
+  justify-content: flex-start; /* ← Voltar ao normal quando tem conteúdo */
+}
+
+/* CORREÇÃO: Garantir que o card de controls ocupe espaço adequado */
+.col-left .card:first-child {
+  width: 100%;
+  max-width: var(--card-w);
+  margin: 0 auto;
 }
 
 /* Ensure child cards are centered and full width */
@@ -171,7 +245,7 @@ body{
 .meta-item .val{font-family:ui-monospace,monospace;font-size:13px;color:#e6eef8;word-break:break-word}
 
 /* center compare area */
-.compare-row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.compare-row{display:flex;gap:12px;align-items:center;justify-content:flex-start;flex-wrap:wrap}
 .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-weight:700}
 .badge.ok{color:var(--success);border:1px solid rgba(102,224,123,0.08)}
 .badge.no{color:var(--danger);border:1px solid rgba(255,107,107,0.06)}
@@ -236,7 +310,7 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
 
 /* ===== LOGO ===== */
 .ts-topbar-logo img{
-  height:52px;
+  height:40px;
   transition:.25s;
 }
 
@@ -377,16 +451,29 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
 
 /* FOOTER FIXO */
 .ts-footer{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#0c0c11;
-  border-top:1px solid rgba(255,255,255,0.08);
-  padding:8px 0;
-  z-index:9999;
-  backdrop-filter:blur(8px);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #0c0c11;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 8px 0;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
   animation: tsFooterFade .8s ease forwards;
+  /* Adicionar margem superior para permitir scroll */
+  margin-top: 0;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 @keyframes tsFooterFade{
@@ -456,11 +543,1139 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
   }
 }
 
+.btn-disabled {
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+  pointer-events: none !important;
+}
+
+/* Estilo para grupos de meta itens com ícones no canto superior esquerdo */
+.meta-group {
+    width: 100%;
+    display: flex;
+    gap: 14px;
+    align-items: stretch;
+    margin-bottom: 20px;
+}
+
+.meta-item-container {
+    flex: 1;
+    position: relative;
+    min-height: 95px;
+}
+
+.meta-icon {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 
+        0 3px 8px rgba(0, 0, 0, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.1);
+    z-index: 3;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-icon:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+        0 5px 12px rgba(125, 91, 255, 0.4),
+        0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.meta-item {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.meta-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(125, 91, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Cabeçalho fixo para o título */
+.meta-item-header {
+    width: 100%;
+    padding: 12px 14px 8px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    flex-shrink: 0;
+}
+
+.meta-item .key {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+}
+
+/* Área de conteúdo com fundo diferente */
+.meta-item-content {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.2);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+}
+
+.meta-item .val {
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    color: #e6eef8;
+    word-break: break-word;
+    line-height: 1.4;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+}
+
+/* Efeito de profundidade para o ícone */
+.meta-item-container::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    opacity: 0.3;
+    filter: blur(3px);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.meta-item-container:hover::before {
+    opacity: 0.5;
+    filter: blur(5px);
+}
+
+/* Sombra do ícone sobrepondo o card */
+.meta-item::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: -1;
+    transition: all 0.3s ease;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 640px) {
+    .meta-group {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .meta-item-container {
+        flex: none;
+        width: 100%;
+        min-height: 85px;
+    }
+    
+    .meta-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        top: -8px;
+        left: -8px;
+    }
+    
+    .meta-item-header {
+        padding: 10px 12px 6px 12px;
+        min-height: 36px;
+    }
+    
+    .meta-item-content {
+        padding: 10px 12px;
+        min-height: 45px;
+    }
+    
+    .meta-item-container::before {
+        width: 28px;
+        height: 28px;
+        top: -5px;
+        left: -5px;
+    }
+    
+    .meta-item::after {
+        width: 28px;
+        height: 28px;
+        top: -3px;
+        left: -3px;
+    }
+}
+
+/* Animações de entrada */
+@keyframes slideInCard {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.meta-item-container {
+    animation: slideInCard 0.5s ease forwards;
+}
+
+.meta-item-container:nth-child(1) { animation-delay: 0.1s; }
+.meta-item-container:nth-child(2) { animation-delay: 0.2s; }
+
+/* Ajuste para garantir que o conteúdo não fique escondido atrás do ícone */
+.meta-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 0;
+}
+
+/* ———————————————— DESKTOP ———————————————— */
+@media (min-width: 981px) {
+
+    /* Garante layout em duas colunas sem igualar alturas */
+    .layout {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 20px;
+    }
+
+    .col-left,
+    .col-right {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    /* ——————————————————————————————
+       META CARD (pode crescer livremente)
+    —————————————————————————————— */
+    #metaCard {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ——————————————————————————————
+       RESULT GRID (altura controlada pelo JS)
+    —————————————————————————————— */
+    #resultGrid {
+        display: flex;
+        flex-direction: column;
+
+        /* CORREÇÃO PRINCIPAL */
+        flex: initial !important;  /* impede o flex de igualar alturas */
+        min-height: auto !important; /* libera o JS para definir min-height */
+    }
+
+    /* ——————————————————————————————
+        CARDS internos
+    —————————————————————————————— */
+    #resultGrid .card,
+    #metaCard.card {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 40px;
+    }
+
+    /* Área interna do card */
+    #resultGrid .card > div:last-child {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Espaço inferior empurrado para baixo */
+    #resultGrid .card > div:last-child > div:last-child {
+        margin-top: auto;
+        padding-top: 20px;
+    }
+}
+
+
+/* ===== CENTRALIZAÇÃO INICIAL ===== */
+.wrap.initial-state {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Garantir que o wrap se expanda com o conteúdo */
+.wrap.has-content {
+  justify-content: flex-start;
+  min-height: auto;
+  padding-bottom: 20px; /* ← Espaço extra no final */
+}
+
+.initial-state .layout {
+  align-items: center;
+  justify-content: center; /* ← Centraliza horizontalmente as colunas */
+}
+
+.initial-state .col-left {
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  width: 100%; /* ← Garante que ocupe toda a largura disponível */
+  max-width: var(--card-w); /* ← Limita a largura máxima */
+  margin: 0 auto; /* ← Centraliza horizontalmente */
+  margin-left: 18px;
+}
+
+/* CORREÇÃO: Centralização horizontal do card de controles */
+.initial-state .col-left > .card:first-child {
+  width: 100%;
+  max-width: var(--card-w);
+  margin: 0 auto; /* ← Esta linha garante centralização horizontal */
+  transform: none !important;
+  align-self: center; /* ← Centraliza horizontalmente dentro do flex container */
+}
+
+@media (max-width: 980px) {
+  .initial-state .layout {
+    width: 100%;
+  }
+}
+
+
+/* ===== SEÇÃO DE APRESENTAÇÃO DO PROJETO ===== */
+.project-intro {
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(125,91,255,0.05));
+  border: 1px solid rgba(125,91,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.project-intro::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.project-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(125,91,255,0.3);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(125,91,255,0.6);
+    transform: scale(1.05);
+  }
+}
+
+.project-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent1), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.project-subtitle {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.project-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.greeting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.greeting i {
+  color: var(--accent1);
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.project-description {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e6eef8;
+  margin: 0;
+}
+
+.ai-badge {
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  color: #041017;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  animation: colorShift 3s ease-in-out infinite;
+}
+
+@keyframes colorShift {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(255,255,255,0.04);
+  transform: translateY(-1px);
+}
+
+.feature-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.feature-item span {
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 600;
+}
+
+.entity-info {
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.entity-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.entity-badge i {
+  color: var(--accent2);
+}
+
+.entity-name {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent1), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+}
+
+.project-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Animação de entrada e saída */
+.project-intro {
+  transition: all 0.5s ease;
+}
+
+.project-intro.hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  display: none !important;
+}
+
+.project-intro:not(.hidden) {
+  animation: slideInUp 0.5s ease;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animações do sistema de status */
+@keyframes blink {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(0.9);
+  }
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* Status offline */
+.status-dot.offline {
+  background: var(--danger);
+  animation: blink 1s ease-in-out infinite;
+}
+
+/* Status carregando */
+.status-dot.loading {
+  background: var(--muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+
+/* Animações do sistema de status */
+@keyframes blink {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(0.9);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* Efeito sutil para os segundos animados */
+#systemStatus {
+  transition: opacity 0.3s ease;
+}
+
+#systemStatus:hover {
+  opacity: 0.8;
+}
+
+/* ===== PULSO SUAVE COM ZOOM SUTIL ===== */
+.entity-name-glow {
+  background: linear-gradient(90deg, var(--accent1), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+  display: inline-block;
+  animation: softZoomPulse 4s ease-in-out infinite;
+}
+
+@keyframes softZoomPulse {
+  0%, 100% {
+    filter: brightness(1) 
+           drop-shadow(0 0 4px rgba(255, 102, 196, 0.2))
+           drop-shadow(0 0 8px rgba(125, 91, 255, 0.1));
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.1) 
+           drop-shadow(0 0 8px rgba(255, 102, 196, 0.3))
+           drop-shadow(0 0 16px rgba(125, 91, 255, 0.2));
+    transform: scale(1.02);
+  }
+}
+
+/* Centralização com classes JavaScript */
+.col-right.centered {
+  justify-content: center;
+}
+
+.col-right.centered .project-intro {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.col-right.has-content {
+  justify-content: flex-start;
+}
+
+
+/* ===== CORREÇÃO DO ESTADO COM CONTEÚDO ===== */
+.main-container.has-content .wrap.has-content {
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+/* Garantir que as colunas se alinhem corretamente no estado com conteúdo */
+.main-container.has-content .layout {
+  align-items: flex-start;
+}
+
+/* Estado inicial - centralizado */
+.main-container.initial-state .wrap.initial-state {
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.main-container.initial-state .layout {
+  align-items: center;
+  justify-content: center;
+}
+
+#metaCard.card {
+  margin-bottom: 54px;
+}
+
+#resultGrid .card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#resultGrid .card > div:last-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ===== CUSTOMIZAÇÃO DA BARRA DE SCROLL ===== */
+.compare-text::-webkit-scrollbar {
+    width: 8px;
+}
+
+.compare-text::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+}
+
+.compare-text::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    border-radius: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.compare-text::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    transform: scale(1.1);
+}
+
+/* Para Firefox */
+.compare-text {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent2) rgba(255, 255, 255, 0.02);
+}
+
+/* Container específico para discrepâncias com scroll personalizado */
+.discrepancies-container {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+    padding-right: 4px;
+}
+
+.discrepancies-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.discrepancies-container::-webkit-scrollbar-track {
+    background: rgba(15, 17, 19, 0.8);
+    border-radius: 3px;
+}
+
+.discrepancies-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--accent2), var(--accent1));
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(125, 91, 255, 0.3);
+}
+
+.discrepancies-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--accent1), var(--accent3));
+    box-shadow: 0 0 15px rgba(255, 102, 196, 0.4);
+}
+
+/* Efeito de brilho na barra de scroll */
+.discrepancies-container::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, var(--accent3), var(--accent2));
+    box-shadow: 0 0 20px rgba(90, 200, 255, 0.5);
+}
+
+/* ===== CORREÇÃO DA LARGURA DO COMPARE-TEXT ===== */
+.compare-text {
+    color: var(--muted);
+    font-size: 13px;
+    text-align: left !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    line-height: 1.4;
+    white-space: normal;
+    word-wrap: break-word;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Garantir que o conteúdo interno ocupe 100% */
+.compare-text > div {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ===== POPUPS DE CONECTIVIDADE E CORS ===== */
+.connectivity-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(6, 6, 7, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.connectivity-content {
+  background: linear-gradient(135deg, rgba(15, 17, 19, 0.95), rgba(11, 12, 14, 0.98));
+  border: 1px solid rgba(125, 91, 255, 0.2);
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.connectivity-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent2), transparent);
+}
+
+.connectivity-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent2), var(--accent3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 32px;
+  color: white;
+  animation: pulseGlow 2s ease-in-out infinite;
+  box-shadow: 0 0 30px rgba(125, 91, 255, 0.4);
+}
+
+.connectivity-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, var(--accent1), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.connectivity-subtitle {
+  font-size: 16px;
+  color: #e6eef8;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.connectivity-message {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.connectivity-details {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: var(--muted);
+}
+
+.detail-value {
+  color: #e6eef8;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+}
+
+.cors-warning {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.connectivity-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.connectivity-btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.connectivity-btn.primary {
+  background: linear-gradient(90deg, var(--accent1), var(--accent2));
+  color: #041017;
+}
+
+.connectivity-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(125, 91, 255, 0.3);
+}
+
+.connectivity-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.connectivity-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6eef8;
+}
+
+/* Animação de conexão perdida */
+@keyframes connectionLost {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.connection-lost .connectivity-icon {
+  animation: connectionLost 1.5s ease-in-out infinite, pulseGlow 2s ease-in-out infinite;
+}
+
+/* Status de verificação */
+.verification-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.verification-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.verification-dot.verifying {
+  background: var(--accent3);
+}
+
+.verification-dot.success {
+  background: var(--success);
+  animation: none;
+}
+
+.verification-dot.error {
+  background: var(--danger);
+  animation: blink 1s ease-in-out infinite;
+}
+
+/* Estilos críticos do popup - carregam mesmo sem internet */
+.connectivity-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(6, 6, 7, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.connectivity-content {
+  background: linear-gradient(135deg, rgba(15, 17, 19, 0.95), rgba(11, 12, 14, 0.98));
+  border: 1px solid rgba(125, 91, 255, 0.2);
+  border-radius: 14px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.connectivity-icon {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7d5bff, #5ac8ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: white;
+}
+
+.connectivity-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #ff66c4, #5ac8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.connectivity-message {
+  font-size: 14px;
+  color: #97a0aa;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.connectivity-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.connectivity-btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 140px;
+}
+
+.connectivity-btn.primary {
+  background: linear-gradient(90deg, #ff66c4, #7d5bff);
+  color: #041017;
+}
+
+.connectivity-btn.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #97a0aa;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+
+.connectivity-selo-icon {
+    width: 110px;     /* aumente aqui */
+    height: 110px;    /* aumente aqui */
+}
+
+
 </style>
+
+<link rel="stylesheet" href="assets/css/protect-level-III.css">
+<link rel="stylesheet" href="assets/css/log-modal.css">
 </head>
 <body>
-
-<div class="wrap">
 
 <!-- TOPBAR ÚNICO -->
 <div class="ts-topbar">
@@ -468,7 +1683,7 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
 
     <!-- LOGO -->
     <a href="#" class="ts-topbar-logo">
-      <img src="https://schema.theusoft.shop/assets/img/logotipo_branco.png" alt="Ṫ͏͏HEÜSOFT" onerror="this.src='https://schema.theusoft.shop/assets/img/logo.png'">
+      <img src="assets/img/art/logotipo_branco.png" alt="Ṫ͏͏HEÜSOFT" onerror="this.src='assets/img/art/logo.png'">
     </a>
 
     <!-- NAVEGAÇÃO (desktop) -->
@@ -514,6 +1729,9 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
 
 <!-- ESSE SPACER GARANTE QUE A UI NÃO FIQUE POR BAIXO DO TOPBAR -->
 <div class="ts-topbar-spacer"></div>
+
+<div class="main-container">
+<div class="wrap">
 
 
   <!-- Layout columns -->
@@ -604,26 +1822,116 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
 
     <div class="col-right">
 
+ <!-- NOVA SEÇÃO: Apresentação do Projeto -->
+      <div id="projectIntro" class="card project-intro">
+        <div class="project-header">
+          <div class="project-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="project-title">
+            <h3>VÆLORÜM</h3>
+            <span class="project-subtitle">Validação Autônoma</span>
+          </div>
+        </div>
+        
+        <div class="project-content">
+          <div class="greeting">
+            <i class="fa-solid fa-sun"></i>
+            <span id="greetingText">Boa tarde</span>
+          </div>
+          
+          <p class="project-description">
+            Plataforma avançada de validação integrada com tecnologia de 
+            <span class="ai-badge">IA Generativa</span> para certificação 
+            automática de documentos digitais.
+          </p>
+          
+          <div class="features-grid">
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fa-solid fa-fingerprint"></i>
+              </div>
+              <span>Hash SHA-256</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <span>IA Integrada</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">
+                <i class="fa-solid fa-certificate"></i>
+              </div>
+              <span>Certificação</span>
+            </div>
+          </div>
+          
+          <div class="entity-info">
+            <div class="entity-badge">
+              <i class="fa-solid fa-building-columns"></i>
+              Entidade Certificadora
+            </div>
+<div class="entity-name entity-name-glow">VÆLORÜM</div>
+          </div>
+        </div>
+        
+<div class="project-footer">
+  <div class="status-indicator">
+    <div class="status-dot"></div>
+    <span id="systemStatus">Carregando status...</span>
+  </div>
+</div>
+      </div>
+
+
       <div id="metaCard" class="card hidden" aria-live="polite">
         <div class="mini-title">Bloco de Validação — itens</div>
         <div id="metaList" class="meta-list"></div>
       </div>
 
-      <div id="logCard" class="card hidden log-card">
-        <div class="mini-title">Atividade</div>
-        <div id="logArea" style="color:var(--muted);font-size:13px;line-height:1.4"></div>
-      </div>
+<!-- Modal de Atividade (transformado do card original) -->
+<div id="logCard" class="log-card activity-modal minimized">
+  <div class="modal-header">
+    <div class="modal-title">
+      <i class="fa-solid fa-list"></i>
+      Atividade
+      <span id="logCounter" class="log-counter">0</span>
+    </div>
+    <div class="modal-actions">
+      <button id="logMinimize" class="modal-btn" title="Minimizar">
+        <i class="fa-solid fa-window-minimize"></i>
+      </button>
+      <button id="logClose" class="modal-btn" title="Fechar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div class="modal-content">
+    <div id="logArea" class="log-area"></div>
+  </div>
+</div>
+
+<!-- Botão flutuante para abrir o modal -->
+<div id="logToggle" class="log-toggle">
+  <i class="fa-solid fa-list"></i>
+  <span id="logToggleCounter" class="log-toggle-counter" style="display: none;">0</span>
+</div>
 
     </div>
   </div>
 
-<footer class="ts-footer">
+</div>
+  
+ </div> 
+ 
+  <footer class="ts-footer">
   <div class="ts-footer-inner">
 
     <!-- LOGO -->
     <div class="ts-footer-logo">
-      <img src="https://schema.theusoft.shop/assets/img/logo_theusoft_branco.png" alt="Ṫ͏͏HEÜSOFT" 
-           onerror="this.src='https://schema.theusoft.shop/assets/img/logo.png'">
+      <img src="assets/img/art/logo_theusoft_branco.png" alt="Ṫ͏͏HEÜSOFT" 
+           onerror="this.src='assets/img/art/logo.png'">
     </div>
 
     <!-- SLOGAN -->
@@ -642,9 +1950,13 @@ footer.site-footer{width:100%;max-width:var(--card-w);margin:18px auto 8px auto;
   </div>
 </footer>
 
+  <!-- proteção NÍVEL 3 -->
+<script src="assets/js/protect-level-III.js"></script>
+<script src="assets/js/validate.js"></script>
+<script src="assets/js/pdf-worker.js"></script>
+<!--<script src="assets/js/ConnectivityManager.js"></script> -->
+<script src="assets/js/log-modal.js"></script>
 
-</div>
 
-<script src="validate.js"></script>
 </body>
 </html>
