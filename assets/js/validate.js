@@ -963,8 +963,16 @@ updateValidationResult(isValid, message) {
 },
   
 populateMetaList(data) {
-    console.log('🎯 populateMetaList CHAMADA - dados:', data);
+	
+//console.log('🎯 populateMetaList CHAMADA - dados:', data);
+ // console.log('🔍 metaCard existe?', !!metaCard);
     
+	
+	// ⭐⭐ CORREÇÃO: Garantir que metaCard seja mostrado
+show(metaCard);
+
+console.log('✅ metaCard mostrado forçadamente');
+
     metaList.innerHTML = '';
     
     if (!data || Object.keys(data).length === 0) {
@@ -1570,21 +1578,28 @@ async function validateHash(hash) {
   try {
     const result = await API.validateHash(hash);
     
-    if (result && result.valid) {
-      // Hash encontrado na API - mostrar todos os dados
-      const apiData = result.data;
-      const validationData = result.validation;
-      
-      // CORREÇÃO: Atualizar todos os hashes da API
-      UIManager.updateHashDisplays({
-        hashWith: apiData.hash_final || '—',
-        hashWithout: validationData.sha256_base || '—',
-        registeredHash: validationData.sha256_base || hash
-      });
-      
-      // Preencher metadados da API
-      // UIManager.populateMetaList(validationData);
-      UIManager.showSuccess('Hash encontrado no registro VÆLORÜM');
+  if (result && result.valid) {
+  const apiData = result.data;
+  const validationData = result.validation;
+  
+  // CORREÇÃO: Atualizar todos os hashes da API
+  UIManager.updateHashDisplays({
+    hashWith: apiData.hash_final || '—',
+    hashWithout: validationData.sha256_base || '—',
+    registeredHash: validationData.sha256_base || hash
+  });
+  
+  // ⭐⭐ CORREÇÃO: Converter e mostrar metadados ⭐⭐
+  if (validationData) {
+    const convertedData = {};
+    Object.keys(validationData).forEach(key => {
+      convertedData[key.toUpperCase()] = validationData[key];
+    });
+    console.log('🎯 Dados convertidos para populateMetaList:', convertedData);
+    UIManager.populateMetaList(convertedData);
+  }
+  
+  UIManager.showSuccess('Hash encontrado no registro VÆLORÜM');
       
       // Se temos um arquivo carregado, fazer comparação completa
       if (STATE.currentFile && STATE.blockData) {
